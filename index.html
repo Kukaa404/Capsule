@@ -1,924 +1,319 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Some Goodbyes Comes With Hellos</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的存款看板</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg:          #f0ece6;
-  --surface:     #f8f5f1;
-  --surface-2:   #ede8e0;
-  --border:      #d8d0c6;
-  --border-2:    #bfb5a8;
-  --ink:         #2d2520;
-  --ink-2:       #5c5048;
-  --ink-3:       #9c9088;
-  --amber:       #7a5c42;
-  --amber-light: #c8b89a;
-  --amber-pale:  #ede8e0;
-  --blue:        #5878a0;
-  --blue-pale:   #dce6f0;
-  --r:           14px;
-  --r-sm:        9px;
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f5f4f0;
+  --color-text-primary:#1a1a18;
+  --color-text-secondary:#5f5e5a;
+  --color-text-tertiary:#888780;
+  --color-border-tertiary:rgba(0,0,0,0.12);
+  --color-border-secondary:rgba(0,0,0,0.22);
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  min-height: 100vh;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
+@media(prefers-color-scheme:dark){
+  :root{
+    --color-background-primary:#1e1e1c;
+    --color-background-secondary:#2a2a28;
+    --color-text-primary:#f0ede6;
+    --color-text-secondary:#b4b2a9;
+    --color-text-tertiary:#888780;
+    --color-border-tertiary:rgba(255,255,255,0.10);
+    --color-border-secondary:rgba(255,255,255,0.20);
+  }
 }
-
-.shell {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 16px 80px;
-}
-
-.hd { padding: 36px 0 24px; }
-.hd-eyebrow {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--blue);
-  margin-bottom: 8px;
-}
-.hd-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--ink);
-  font-style: normal;
-}
-.hd-rule {
-  margin-top: 20px;
-  height: 1px;
-  background: var(--border);
-  position: relative;
-}
-.hd-rule::after {
-  content: '';
-  position: absolute;
-  left: 0; top: -1px;
-  width: 40px; height: 3px;
-  background: var(--blue);
-  border-radius: 2px;
-}
-
-.tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin: 20px 0;
-}
-.tab {
-  text-align: center;
-  padding: 9px 4px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  cursor: pointer;
-  border-radius: var(--r-sm);
-  border: 1px solid transparent;
-  transition: all 0.18s;
-  user-select: none;
-}
-.tab:hover { color: var(--ink-2); }
-.tab.active { background: var(--surface); border-color: var(--border); color: var(--blue); }
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 22px 20px;
-}
-
-.date-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-.date-txt {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  color: var(--ink);
-}
-.date-pick {
-  font-size: 11px;
-  color: var(--ink-3);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 5px 10px;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  outline: none;
-  color-scheme: light;
-  transition: border-color 0.15s;
-}
-.date-pick:hover { border-color: var(--border-2); }
-
-.lbl {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-bottom: 10px;
-}
-
-.emoji-grid {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 6px;
-  margin-bottom: 20px;
-}
-.e-btn {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  font-size: 17px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s;
-  line-height: 1;
-  padding: 0;
-}
-.e-btn:hover { border-color: var(--border-2); background: var(--amber-pale); }
-.e-btn.on { border-color: var(--blue); background: var(--blue-pale); }
-
-textarea {
-  width: 100%;
-  min-height: 120px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 13px 15px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 17px;
-  font-weight: 300;
-  color: var(--ink);
-  line-height: 1.75;
-  resize: none;
-  outline: none;
-  transition: border-color 0.15s;
-}
-textarea:focus { border-color: var(--border-2); }
-textarea::placeholder { color: var(--ink-3); font-style: italic; }
-
-.img-sec { margin: 14px 0 0; }
-.img-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  color: var(--ink-2);
-  cursor: pointer;
-  padding: 7px 14px;
-  border: 1px dashed var(--border-2);
-  border-radius: var(--r-sm);
-  transition: all 0.15s;
-  background: transparent;
-}
-.img-add-btn:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-pale); }
-.img-wrap { position: relative; margin-top: 10px; }
-.img-full {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--border);
-  display: block;
-}
-.img-del {
-  position: absolute;
-  top: 7px; right: 7px;
-  width: 24px; height: 24px;
-  background: rgba(36,26,14,0.65);
-  border-radius: 50%;
-  color: white;
-  font-size: 10px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.act-row { display: flex; gap: 8px; margin-top: 18px; }
-.btn-save {
-  flex: 1;
-  background: var(--amber);
-  color: white;
-  border: none;
-  border-radius: var(--r-sm);
-  padding: 12px 20px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.btn-save:hover { opacity: 0.88; }
-.btn-clear {
-  background: transparent;
-  color: var(--ink-3);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 12px 18px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.btn-clear:hover { border-color: var(--border-2); color: var(--ink-2); }
-
-.toast {
-  text-align: center;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  color: var(--amber);
-  margin-top: 12px;
-  opacity: 0;
-  transition: opacity 0.35s;
-  text-transform: uppercase;
-}
-.toast.on { opacity: 1; }
-
-.sync-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-.sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-3); cursor: pointer; }
-.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); flex-shrink: 0; }
-.sync-dot.ok { background: var(--blue); }
-.sync-dot.err { background: #c0502a; }
-.sync-dot.busy { background: var(--amber); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
-.btn-sync {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--blue);
-  background: var(--blue-pale);
-  border: 1px solid var(--blue-pale);
-  border-radius: var(--r-sm);
-  padding: 5px 12px;
-  cursor: pointer;
-  transition: opacity 0.15s;
-  font-family: 'DM Sans', sans-serif;
-}
-.btn-sync:hover { opacity: 0.8; }
-
-/* Capsule */
-.shake-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 36px 0 24px;
-}
-.btn-shake {
-  background: var(--amber);
-  color: white;
-  border: none;
-  padding: 16px 56px;
-  border-radius: var(--r);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: opacity 0.15s, transform 0.12s;
-}
-.btn-shake:hover { opacity: 0.88; }
-.btn-shake:active { transform: scale(0.97); }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.cap-card {
-  margin-top: 24px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 20px;
-  animation: fadeUp 0.4s ease;
-}
-.cap-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-.cap-emoji { font-size: 20px; }
-.cap-date { font-size: 12px; color: var(--ink-2); }
-.cap-body {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 19px;
-  font-weight: 300;
-  color: var(--ink);
-  line-height: 1.8;
-}
-.cap-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: var(--r-sm); border: 1px solid var(--border); margin-top: 14px; display: block; }
-
-/* Archive */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 8px;
-  margin-bottom: 18px;
-}
-.stat { background: var(--surface-2); border-radius: var(--r-sm); padding: 14px 8px; text-align: center; }
-.stat-n {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 30px;
-  font-weight: 300;
-  color: var(--ink);
-  line-height: 1;
-}
-.stat-l { font-size: 10px; color: var(--ink-3); margin-top: 4px; letter-spacing: 0.5px; }
-
-.srch {
-  width: 100%;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 9px 14px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  color: var(--ink);
-  outline: none;
-  margin-bottom: 14px;
-  transition: border-color 0.15s;
-}
-.srch:focus { border-color: var(--border-2); }
-.srch::placeholder { color: var(--ink-3); }
-
-.elist { display: flex; flex-direction: column; gap: 8px; }
-.ecard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: border-color 0.15s;
-  position: relative;
-}
-.ecard:hover { border-color: var(--border-2); }
-.ecard-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.ecard-emoji { font-size: 15px; }
-.ecard-date { font-size: 11px; color: var(--ink-3); }
-.ecard-txt {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-weight: 300;
-  color: var(--ink-2);
-  line-height: 1.65;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.ecard-img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); margin-top: 8px; display: block; }
-.ecard-del {
-  position: absolute; top: 12px; right: 12px;
-  background: none; border: none;
-  font-size: 11px; color: var(--ink-3);
-  cursor: pointer; padding: 2px 4px;
-  font-family: 'DM Sans', sans-serif;
-}
-.ecard-del:hover { color: #b03a2e; }
-
-.no-entries {
-  text-align: center;
-  padding: 36px 0;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  color: var(--ink-3);
-}
-
-.data-btns { display: flex; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
-.btn-d {
-  flex: 1;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--ink-2);
-  cursor: pointer;
-  transition: all 0.12s;
-  text-align: center;
-}
-.btn-d:hover { border-color: var(--amber); color: var(--amber); }
-
-/* Modal */
-.overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(36,26,14,0.45);
-  z-index: 300;
-  align-items: flex-end;
-  justify-content: center;
-}
-.overlay.on { display: flex; }
-.sheet {
-  background: var(--surface);
-  border-radius: var(--r) var(--r) 0 0;
-  padding: 16px 20px 40px;
-  width: 100%;
-  max-width: 480px;
-  max-height: 82vh;
-  overflow-y: auto;
-  animation: slideUp 0.25s ease;
-}
-@keyframes slideUp {
-  from { transform: translateY(24px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-.sheet-handle { width: 32px; height: 3px; background: var(--border-2); border-radius: 2px; margin: 0 auto 20px; }
-.sheet-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.sheet-emoji { font-size: 18px; }
-.sheet-date { font-size: 12px; color: var(--ink-3); }
-.sheet-body {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px;
-  font-weight: 300;
-  color: var(--ink);
-  line-height: 1.85;
-}
-.sheet-img { width: 100%; max-height: 260px; object-fit: cover; border-radius: var(--r-sm); border: 1px solid var(--border); margin-top: 14px; display: block; }
-.sheet-close {
-  display: block; width: 100%; margin-top: 18px;
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: var(--r-sm); padding: 10px;
-  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
-  color: var(--ink-2); cursor: pointer; transition: border-color 0.12s;
-  letter-spacing: 0.3px;
-}
-.sheet-close:hover { border-color: var(--border-2); }
-
-/* Setup panel */
-.setup-card {
-  background: var(--blue-pale);
-  border: 1px solid var(--blue);
-  border-radius: var(--r);
-  padding: 16px 18px;
-  margin-top: 12px;
-}
-.setup-title { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
-.setup-txt { font-size: 13px; color: var(--ink-2); line-height: 1.65; }
-.setup-input {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
-  padding: 8px 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  color: var(--ink);
-  outline: none;
-  margin-top: 10px;
-}
-.setup-input::placeholder { color: var(--ink-3); }
-.setup-input:focus { border-color: var(--blue); }
-
-#imgFileInput, #importFile { display: none; }
+body{font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary);padding:1.5rem;max-width:860px;margin:0 auto}
+.db{padding:1.5rem 0 2rem}
+.row{display:grid;gap:10px}
+.r4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.r2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sec{margin-bottom:2rem}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.08em;margin-bottom:.75rem}
+.met{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem 1.125rem}
+.met-lbl{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px}
+.met-val{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.met-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+.blue{color:#185FA5}.red{color:#A32D2D}.pos{color:#3B6D11}.neg{color:#A32D2D}
+.goal-wrap{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem 1.5rem}
+.goal-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px}
+.goal-nums{display:flex;flex-direction:column;gap:3px}
+.goal-curr{font-size:28px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.goal-of{font-size:12px;color:var(--color-text-tertiary)}
+.goal-right{text-align:right}
+.goal-pct{font-size:32px;font-weight:500;color:#185FA5;line-height:1}
+.goal-remain{font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
+.track{height:8px;background:var(--color-background-secondary);border-radius:99px;overflow:hidden;margin-bottom:8px}
+.fill{height:100%;border-radius:99px;background:#378ADD;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.fill.done{background:#1D9E75}
+.track-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-tertiary)}
+.ch-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:.875rem 1rem}
+.ch-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ch-name{font-size:11px;color:var(--color-text-secondary)}
+.ch-pill{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500}
+.pill-blue{background:#E6F1FB;color:#185FA5}
+.pill-teal{background:#E1F5EE;color:#0F6E56}
+.pill-amber{background:#FAEEDA;color:#633806}
+.pill-purple{background:#EEEDFE;color:#3C3489}
+.ch-val{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:7px}
+.ch-track{height:4px;background:var(--color-background-secondary);border-radius:99px;overflow:hidden}
+.ch-fill{height:100%;border-radius:99px;transition:width .6s ease}
+.ch-foot{display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-tertiary);margin-top:5px}
+.dcard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.125rem}
+.dcard-name{font-size:11px;color:var(--color-text-secondary);margin-bottom:5px}
+.dcard-val{font-size:20px;font-weight:500;color:#993556}
+.dcard-trend{display:flex;align-items:center;gap:5px;margin-top:5px}
+.trend-badge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500}
+.badge-up{background:#FCEBEB;color:#A32D2D}
+.badge-dn{background:#E1F5EE;color:#0F6E56}
+.chart-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.125rem 1.25rem;margin-bottom:1rem}
+.chart-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.chart-title{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--color-text-secondary)}
+.leg span{display:flex;align-items:center;gap:4px}
+.leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.upd-btn-wrap{text-align:center;padding-top:.5rem}
+.upd-btn{font-size:12px;padding:7px 20px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1.375rem 1.5rem;width:340px;max-width:92vw;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+.modal-sub{font-size:11px;color:var(--color-text-tertiary);margin-bottom:1.125rem}
+.modal-group{font-size:10px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.07em;margin:14px 0 8px;padding-bottom:5px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.modal-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.modal-row label{font-size:12px;color:var(--color-text-secondary)}
+.modal-row input{width:140px;font-size:13px;padding:5px 9px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);text-align:right}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:1.25rem}
+.btn-save{font-size:13px;padding:7px 20px;border-radius:var(--border-radius-md);border:none;background:#378ADD;color:#fff;cursor:pointer}
+.btn-cancel{font-size:13px;padding:7px 14px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer}
+@media(max-width:600px){.r4{grid-template-columns:repeat(2,minmax(0,1fr))}.r2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<div class="db">
 
-<div class="shell">
-
-  <div class="hd">
-    <div class="hd-eyebrow">Time Capsule</div>
-    <div class="hd-title">Some Goodbyes Comes<br>With Hellos</div>
-    <div class="hd-rule"></div>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('write')">Write</div>
-    <div class="tab"        onclick="switchTab('capsule')">Shake</div>
-    <div class="tab"        onclick="switchTab('archive')">Archive</div>
-  </div>
-
-  <!-- Write -->
-  <div class="card" id="tab-write">
-    <div class="date-row">
-      <div class="date-txt" id="date-display"></div>
-      <input type="date" class="date-pick" id="date-picker" onchange="updateDateDisplay()">
-    </div>
-
-    <div style="margin-bottom:20px;">
-      <div class="lbl">How do you feel</div>
-      <div class="emoji-grid">
-        <button class="e-btn" onclick="toggleEmoji(this,'☀️')">☀️</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'⛅')">⛅</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'☁️')">☁️</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'🌧️')">🌧️</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'⚡')">⚡</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'🌈')">🌈</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'❄️')">❄️</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'🌫️')">🌫️</button>
-        <button class="e-btn" onclick="toggleEmoji(this,'🌙')">🌙</button>
-      </div>
-    </div>
-
-    <textarea id="entry-text" placeholder="…"></textarea>
-
-    <div class="img-sec">
-      <span class="img-add-btn" id="img-add-btn" onclick="document.getElementById('imgFileInput').click()">
-        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Add photo
-      </span>
-      <input type="file" id="imgFileInput" accept="image/*" onchange="handleImage(event)">
-      <div id="img-preview"></div>
-    </div>
-
-    <div class="act-row">
-      <button class="btn-save" onclick="saveEntry()">Save</button>
-      <button class="btn-clear" onclick="clearForm()">Clear</button>
-    </div>
-    <div class="toast" id="save-toast">Saved ✦</div>
-
-    <div class="sync-row">
-      <div class="sync-status" onclick="showSetup()">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-label">Tap to connect sync</span>
-      </div>
-      <button class="btn-sync" onclick="manualSync()">Sync now</button>
-    </div>
-  </div>
-
-  <!-- Capsule -->
-  <div class="card" id="tab-capsule" style="display:none;">
-    <div class="shake-wrap">
-      <button class="btn-shake" onclick="shakeCapsule()">Shake Shake</button>
-    </div>
-    <div id="cap-result"></div>
-  </div>
-
-  <!-- Archive -->
-  <div class="card" id="tab-archive" style="display:none;">
-    <div class="stats">
-      <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">entries</div></div>
-      <div class="stat"><div class="stat-n" id="s-days">0</div><div class="stat-l">days</div></div>
-      <div class="stat"><div class="stat-n" id="s-imgs">0</div><div class="stat-l">photos</div></div>
-    </div>
-    <input type="text" class="srch" id="srch" placeholder="Search entries…" oninput="renderArchive()">
-    <div class="elist" id="elist"></div>
-    <div class="data-btns">
-      <button class="btn-d" onclick="exportJSON()">Export JSON</button>
-      <button class="btn-d" onclick="document.getElementById('importFile').click()">Import</button>
-      <input type="file" id="importFile" accept=".json" onchange="importJSON(event)">
-    </div>
-  </div>
-
-  <!-- GitHub sync setup -->
-  <div id="setup-panel" style="display:none;">
-    <div class="setup-card">
-      <div class="setup-title">Connect GitHub Sync</div>
-      <div class="setup-txt">
-        Paste a GitHub Personal Access Token with <strong>gist</strong> scope.<br>
-        Your data will sync as a private Gist under <strong>Kukaa404</strong>.<br>
-        Token is stored locally on this device only.
-      </div>
-      <input type="password" class="setup-input" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="btn-save" style="font-size:11px;padding:8px 16px;letter-spacing:0.5px;" onclick="saveToken()">Connect</button>
-        <button class="btn-clear" style="font-size:11px;padding:8px 14px;" onclick="document.getElementById('setup-panel').style.display='none'">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- Entry modal -->
-<div class="overlay" id="modal" onclick="closeModal(event)">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-meta">
-      <span class="sheet-emoji" id="m-emoji"></span>
-      <span class="sheet-date" id="m-date"></span>
-    </div>
-    <div class="sheet-body" id="m-body"></div>
-    <div id="m-img"></div>
-    <button class="sheet-close" onclick="document.getElementById('modal').classList.remove('on')">Close</button>
+<div class="sec">
+  <div class="sec-label">总览</div>
+  <div class="row r4">
+    <div class="met"><div class="met-lbl">净资产</div><div class="met-val blue" id="m-net">—</div><div class="met-sub">存款 − 负债</div></div>
+    <div class="met"><div class="met-lbl">总存款</div><div class="met-val" id="m-total">—</div><div class="met-sub">四渠道合计</div></div>
+    <div class="met"><div class="met-lbl">总负债</div><div class="met-val red" id="m-debt">—</div><div class="met-sub">信用卡合计</div></div>
+    <div class="met"><div class="met-lbl">本月净增</div><div class="met-val" id="m-inc">—</div><div class="met-sub">vs 上月净资产</div></div>
   </div>
 </div>
 
+<div class="sec">
+  <div class="sec-label">存款目标 · ¥1,000,000</div>
+  <div class="goal-wrap">
+    <div class="goal-top">
+      <div class="goal-nums">
+        <span class="goal-curr" id="g-curr">—</span>
+        <span class="goal-of">目标 ¥1,000,000</span>
+      </div>
+      <div class="goal-right">
+        <div class="goal-pct" id="g-pct">—</div>
+        <div class="goal-remain" id="g-remain">还差 —</div>
+      </div>
+    </div>
+    <div class="track"><div class="fill" id="g-bar" style="width:0%"></div></div>
+    <div class="track-labels"><span>¥0</span><span>¥25万</span><span>¥50万</span><span>¥75万</span><span>¥100万</span></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">存款渠道</div>
+  <div class="row r4" id="ch-grid"></div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">信用卡负债</div>
+  <div class="row r2" id="debt-grid"></div>
+</div>
+
+<div class="sec">
+  <div class="chart-card">
+    <div class="chart-hd">
+      <span class="chart-title">存款趋势（近6个月）</span>
+      <div class="leg" id="save-leg"></div>
+    </div>
+    <div style="position:relative;height:175px"><canvas id="saveChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-hd">
+      <span class="chart-title">信用卡消费趋势（近6个月）</span>
+      <div class="leg" id="debt-leg"></div>
+    </div>
+    <div style="position:relative;height:175px"><canvas id="debtChart"></canvas></div>
+  </div>
+</div>
+
+<div class="upd-btn-wrap">
+  <button class="upd-btn" onclick="openModal()">✏ 更新本月数据</button>
+</div>
+
+</div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title">更新本月数据</div>
+    <div class="modal-sub" id="modal-month"></div>
+    <div class="modal-group">存款渠道</div>
+    <div class="modal-row"><label>支付宝</label><input id="f-alipay" type="number"></div>
+    <div class="modal-row"><label>微信</label><input id="f-wechat" type="number"></div>
+    <div class="modal-row"><label>招商银行</label><input id="f-cmb" type="number"></div>
+    <div class="modal-row"><label>其他银行</label><input id="f-other" type="number"></div>
+    <div class="modal-group">信用卡账单</div>
+    <div class="modal-row"><label>招商信用卡</label><input id="f-d-cmb" type="number"></div>
+    <div class="modal-row"><label>中信信用卡</label><input id="f-d-citic" type="number"></div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-save" onclick="saveModal()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const LKEY = 'capsule_v3';
-const GIST_KEY = 'capsule_gist_id';
-const TOKEN_KEY = 'capsule_gh_token';
+const GOAL = 1000000;
+const MONTHS = ['10月','11月','12月','1月','2月','3月'];
 
-let entries = [];
-let curEmoji = '';
-let curImg = null;
+const CH = [
+  {key:'alipay', name:'支付宝',   pillClass:'pill-blue',  fillColor:'#378ADD', history:[18000,19500,21000,22000,23500,24000]},
+  {key:'wechat', name:'微信',     pillClass:'pill-teal',  fillColor:'#1D9E75', history:[5000,5200,5500,5800,6200,6500]},
+  {key:'cmb',    name:'招商银行', pillClass:'pill-amber', fillColor:'#BA7517', history:[30000,33000,35000,38000,40000,43000]},
+  {key:'other',  name:'其他银行', pillClass:'pill-purple',fillColor:'#7F77DD', history:[10000,10500,11000,11500,12000,13000]},
+];
+const DEBTS = [
+  {key:'d-cmb',  name:'招商信用卡', history:[3200,2800,4100,3600,2900,3800]},
+  {key:'d-citic',name:'中信信用卡', history:[1500,2000,1800,2200,1600,2100]},
+];
+const D_COLORS = ['#D85A30','#D4537E'];
 
-function load() {
-  try { const r = localStorage.getItem(LKEY); if (r) entries = JSON.parse(r); } catch { entries = []; }
-}
-function persist() {
-  try { localStorage.setItem(LKEY, JSON.stringify(entries)); } catch {}
-}
-function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
-function getGistId() { return localStorage.getItem(GIST_KEY) || ''; }
+function fmt(n){return '¥'+Math.round(Math.abs(n)).toLocaleString('zh-CN')}
+function last(a){return a[a.length-1]}
+function prev(a){return a[a.length-2]}
+function totalS(){return CH.reduce((s,c)=>s+last(c.history),0)}
+function totalD(){return DEBTS.reduce((s,d)=>s+last(d.history),0)}
+function totalSprev(){return CH.reduce((s,c)=>s+prev(c.history),0)}
+function totalDprev(){return DEBTS.reduce((s,d)=>s+prev(d.history),0)}
 
-function init() {
-  load();
-  document.getElementById('date-picker').value = new Date().toISOString().split('T')[0];
-  updateDateDisplay();
-  updateSyncStatus();
-  if (getToken()) syncFromGist();
-}
-
-function updateDateDisplay() {
-  const v = document.getElementById('date-picker').value;
-  if (!v) return;
-  const d = new Date(v + 'T12:00:00');
-  const D = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('date-display').textContent = D[d.getDay()] + ', ' + M[d.getMonth()] + ' ' + d.getDate();
-}
-
-function fmtDate(s) {
-  const d = new Date(s + 'T12:00:00');
-  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  return D[d.getDay()] + ', ' + M[d.getMonth()] + ' ' + d.getDate() + ' ' + d.getFullYear();
+function updateMetrics(){
+  const ts=totalS(),td=totalD(),net=ts-td;
+  const inc=net-(totalSprev()-totalDprev());
+  document.getElementById('m-net').textContent=fmt(net);
+  document.getElementById('m-total').textContent=fmt(ts);
+  document.getElementById('m-debt').textContent=fmt(td);
+  const el=document.getElementById('m-inc');
+  el.textContent=(inc>=0?'+':'-')+fmt(inc);
+  el.className='met-val '+(inc>=0?'pos':'neg');
 }
 
-function switchTab(name) {
-  ['write','capsule','archive'].forEach((t,i) => {
-    document.getElementById('tab-'+t).style.display = t===name ? 'block' : 'none';
-    document.querySelectorAll('.tab')[i].classList.toggle('active', t===name);
-  });
-  if (name==='archive') { updateStats(); renderArchive(); }
+function updateGoal(){
+  const ts=totalS(),p=Math.min(100,Math.round(ts/GOAL*100));
+  document.getElementById('g-curr').textContent=fmt(ts);
+  document.getElementById('g-pct').textContent=p+'%';
+  document.getElementById('g-remain').textContent='还差 '+fmt(Math.max(0,GOAL-ts));
+  const bar=document.getElementById('g-bar');
+  bar.style.width=p+'%';
+  bar.className='fill'+(p>=100?' done':'');
 }
 
-function toggleEmoji(el, e) {
-  document.querySelectorAll('.e-btn').forEach(b => b.classList.remove('on'));
-  curEmoji = curEmoji===e ? '' : e;
-  if (curEmoji) el.classList.add('on');
-}
-
-function handleImage(ev) {
-  const f = ev.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = e => { curImg = e.target.result; renderImgPreview(); };
-  r.readAsDataURL(f);
-  ev.target.value = '';
-}
-function renderImgPreview() {
-  const btn = document.getElementById('img-add-btn');
-  const prev = document.getElementById('img-preview');
-  if (curImg) {
-    btn.style.display = 'none';
-    prev.innerHTML = `<div class="img-wrap"><img class="img-full" src="${curImg}"><button class="img-del" onclick="removeImg()">✕</button></div>`;
-  } else {
-    btn.style.display = 'inline-flex';
-    prev.innerHTML = '';
-  }
-}
-function removeImg() { curImg = null; renderImgPreview(); }
-
-function saveEntry() {
-  const txt = document.getElementById('entry-text').value.trim();
-  if (!txt) return;
-  const dateVal = document.getElementById('date-picker').value;
-  const now = new Date();
-  entries.push({
-    id: Date.now(),
-    date: dateVal,
-    time: now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0'),
-    emoji: curEmoji,
-    text: txt,
-    img: curImg || null
-  });
-  entries.sort((a,b) => b.date.localeCompare(a.date) || b.id-a.id);
-  persist();
-  if (getToken()) syncToGist();
-  const t = document.getElementById('save-toast');
-  t.classList.add('on');
-  setTimeout(() => t.classList.remove('on'), 2200);
-  clearForm();
-}
-
-function clearForm() {
-  document.getElementById('entry-text').value = '';
-  document.querySelectorAll('.e-btn').forEach(b => b.classList.remove('on'));
-  curEmoji = ''; curImg = null; renderImgPreview();
-  document.getElementById('date-picker').value = new Date().toISOString().split('T')[0];
-  updateDateDisplay();
-}
-
-function shakeCapsule() {
-  if (!entries.length) {
-    document.getElementById('cap-result').innerHTML = '<div class="no-entries">Nothing yet — write today first</div>';
-    return;
-  }
-  const e = entries[Math.floor(Math.random() * entries.length)];
-  document.getElementById('cap-result').innerHTML = `
-    <div class="cap-card">
-      <div class="cap-meta">
-        ${e.emoji ? `<span class="cap-emoji">${e.emoji}</span>` : ''}
-        <span class="cap-date">${fmtDate(e.date)}${e.time ? ' · ' + e.time : ''}</span>
-      </div>
-      <div class="cap-body">${e.text.replace(/\n/g,'<br>')}</div>
-      ${e.img ? `<img class="cap-img" src="${e.img}">` : ''}
+function renderChannels(){
+  const ts=totalS();
+  document.getElementById('ch-grid').innerHTML=CH.map(c=>{
+    const v=last(c.history),p=Math.round(v/ts*100),diff=v-prev(c.history);
+    return `<div class="ch-card">
+      <div class="ch-top"><span class="ch-name">${c.name}</span><span class="ch-pill ${c.pillClass}">${p}%</span></div>
+      <div class="ch-val">${fmt(v)}</div>
+      <div class="ch-track"><div class="ch-fill" style="width:${p}%;background:${c.fillColor}"></div></div>
+      <div class="ch-foot"><span>占比 ${p}%</span><span>${diff>=0?'+':'-'}${fmt(diff)}</span></div>
     </div>`;
+  }).join('');
 }
 
-function renderArchive() {
-  updateStats();
-  const q = (document.getElementById('srch').value||'').toLowerCase();
-  const list = q ? entries.filter(e => e.text.toLowerCase().includes(q)||e.date.includes(q)) : [...entries];
-  const el = document.getElementById('elist');
-  if (!list.length) { el.innerHTML = '<div class="no-entries">No entries found</div>'; return; }
-  el.innerHTML = list.map(e => `
-    <div class="ecard" onclick="openEntry(${e.id})">
-      <button class="ecard-del" onclick="event.stopPropagation();delEntry(${e.id})">Delete</button>
-      <div class="ecard-top">
-        ${e.emoji ? `<span class="ecard-emoji">${e.emoji}</span>` : ''}
-        <span class="ecard-date">${fmtDate(e.date)}</span>
+function renderDebts(){
+  document.getElementById('debt-grid').innerHTML=DEBTS.map((d,i)=>{
+    const v=last(d.history),diff=v-prev(d.history),up=diff>0;
+    return `<div class="dcard">
+      <div class="dcard-name">${d.name}</div>
+      <div class="dcard-val">${fmt(v)}</div>
+      <div class="dcard-trend">
+        <span class="trend-badge ${up?'badge-up':'badge-dn'}">${up?'▲':'▼'} ${fmt(Math.abs(diff))}</span>
+        <span style="font-size:10px;color:var(--color-text-tertiary)">${up?'较上月多':'较上月少'}</span>
       </div>
-      <div class="ecard-txt">${e.text}</div>
-      ${e.img ? `<img class="ecard-img" src="${e.img}">` : ''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-function updateStats() {
-  document.getElementById('s-total').textContent = entries.length;
-  document.getElementById('s-days').textContent = new Set(entries.map(e=>e.date)).size;
-  document.getElementById('s-imgs').textContent = entries.filter(e=>e.img).length;
+let saveChart=null,debtChart=null;
+function renderCharts(){
+  document.getElementById('save-leg').innerHTML=CH.map(c=>`<span><span class="leg-sq" style="background:${c.fillColor}"></span>${c.name}</span>`).join('');
+  if(saveChart) saveChart.destroy();
+  saveChart=new Chart(document.getElementById('saveChart'),{
+    type:'line',
+    data:{labels:MONTHS,datasets:CH.map(c=>({
+      label:c.name,data:c.history,
+      borderColor:c.fillColor,backgroundColor:c.fillColor+'20',
+      borderWidth:2,tension:.4,pointRadius:3,pointHoverRadius:5,fill:false
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{grid:{color:'#88878012'},ticks:{font:{size:10},color:'#888780'},border:{display:false}},
+        y:{grid:{color:'#88878012'},ticks:{font:{size:10},color:'#888780',callback:v=>'¥'+(v/1000).toFixed(0)+'k'},border:{display:false}}
+      }}
+  });
+
+  document.getElementById('debt-leg').innerHTML=DEBTS.map((d,i)=>`<span><span class="leg-sq" style="background:${D_COLORS[i]}"></span>${d.name}</span>`).join('');
+  if(debtChart) debtChart.destroy();
+  debtChart=new Chart(document.getElementById('debtChart'),{
+    type:'bar',
+    data:{labels:MONTHS,datasets:DEBTS.map((d,i)=>({
+      label:d.name,data:d.history,
+      backgroundColor:D_COLORS[i]+'bb',borderWidth:0,borderRadius:4
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:10},color:'#888780'},border:{display:false}},
+        y:{stacked:true,grid:{color:'#88878012'},ticks:{font:{size:10},color:'#888780',callback:v=>'¥'+(v/1000).toFixed(1)+'k'},border:{display:false}}
+      }}
+  });
 }
 
-function openEntry(id) {
-  const e = entries.find(x=>x.id===id); if (!e) return;
-  document.getElementById('m-emoji').textContent = e.emoji||'';
-  document.getElementById('m-date').textContent = fmtDate(e.date) + (e.time ? ' · '+e.time : '');
-  document.getElementById('m-body').innerHTML = e.text.replace(/\n/g,'<br>');
-  document.getElementById('m-img').innerHTML = e.img ? `<img class="sheet-img" src="${e.img}">` : '';
-  document.getElementById('modal').classList.add('on');
-}
-function closeModal(ev) { if (ev.target===document.getElementById('modal')) document.getElementById('modal').classList.remove('on'); }
+function refresh(){updateMetrics();updateGoal();renderChannels();renderDebts();renderCharts();}
 
-function delEntry(id) {
-  if (!confirm('Delete this entry?')) return;
-  entries = entries.filter(e=>e.id!==id);
-  persist();
-  if (getToken()) syncToGist();
-  renderArchive();
+function openModal(){
+  const now=new Date();
+  document.getElementById('modal-month').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+  CH.forEach(c=>{const el=document.getElementById('f-'+c.key);if(el)el.value=last(c.history);});
+  DEBTS.forEach(d=>{const el=document.getElementById('f-'+d.key);if(el)el.value=last(d.history);});
+  document.getElementById('modal-bg').classList.add('open');
 }
-
-function exportJSON() {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(entries,null,2)],{type:'application/json'}));
-  a.download = 'capsule-' + new Date().toISOString().split('T')[0] + '.json';
-  a.click();
-}
-function importJSON(ev) {
-  const f = ev.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!Array.isArray(data)) return;
-      if (!confirm(`Import ${data.length} entries? (will merge)`)) return;
-      const ids = new Set(entries.map(x=>x.id));
-      data.forEach(x => { if (!ids.has(x.id)) entries.push(x); });
-      entries.sort((a,b)=>b.date.localeCompare(a.date));
-      persist();
-      if (getToken()) syncToGist();
-      renderArchive();
-    } catch { alert('Invalid file'); }
-  };
-  r.readAsText(f);
-  ev.target.value='';
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+function saveModal(){
+  CH.forEach(c=>{
+    const el=document.getElementById('f-'+c.key);
+    if(el){c.history.push(parseFloat(el.value)||last(c.history));c.history.shift();}
+  });
+  DEBTS.forEach(d=>{
+    const el=document.getElementById('f-'+d.key);
+    if(el){d.history.push(parseFloat(el.value)||last(d.history));d.history.shift();}
+  });
+  closeModal();refresh();
 }
 
-/* ── GitHub Gist sync ── */
-function updateSyncStatus(state, msg) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.className = 'sync-dot';
-  if (!getToken()) { lbl.textContent = 'Tap to connect sync'; return; }
-  const states = { ok:'ok', err:'err', busy:'busy' };
-  if (states[state]) dot.classList.add(state);
-  lbl.textContent = msg || (state==='ok' ? 'Synced' : state==='err' ? 'Sync error' : state==='busy' ? 'Syncing…' : 'Connected');
-}
+document.getElementById('modal-bg').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
 
-function showSetup() {
-  const p = document.getElementById('setup-panel');
-  p.style.display = p.style.display==='none' ? 'block' : 'none';
-}
-
-function saveToken() {
-  const t = document.getElementById('token-input').value.trim();
-  if (!t) return;
-  localStorage.setItem(TOKEN_KEY, t);
-  document.getElementById('setup-panel').style.display = 'none';
-  updateSyncStatus('busy','Connecting…');
-  syncFromGist();
-}
-
-async function syncToGist() {
-  const token = getToken(); if (!token) return;
-  updateSyncStatus('busy','Saving…');
-  try {
-    const content = JSON.stringify(entries, null, 2);
-    const gistId = getGistId();
-    const url = gistId ? `https://api.github.com/gists/${gistId}` : 'https://api.github.com/gists';
-    const method = gistId ? 'PATCH' : 'POST';
-    const body = gistId
-      ? { files: { 'capsule-data.json': { content } } }
-      : { description:'Time Capsule — Kukaa404', public:false, files:{ 'capsule-data.json':{ content } } };
-    const res = await fetch(url, {
-      method,
-      headers: { Authorization:`token ${token}`, 'Content-Type':'application/json' },
-      body: JSON.stringify(body)
-    });
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    localStorage.setItem(GIST_KEY, data.id);
-    updateSyncStatus('ok','Synced just now');
-  } catch { updateSyncStatus('err','Sync failed — check token'); }
-}
-
-async function syncFromGist() {
-  const token = getToken(); if (!token) return;
-  const gistId = getGistId();
-  if (!gistId) {
-    if (entries.length > 0) syncToGist();
-    else updateSyncStatus('ok','Connected — write something first');
-    return;
-  }
-  updateSyncStatus('busy','Loading…');
-  try {
-    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-      headers: { Authorization:`token ${token}` }
-    });
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    const content = data.files['capsule-data.json']?.content;
-    if (content) {
-      const remote = JSON.parse(content);
-      const ids = new Set(entries.map(x=>x.id));
-      let added = 0;
-      remote.forEach(x => { if (!ids.has(x.id)) { entries.push(x); added++; } });
-      if (added) {
-        entries.sort((a,b)=>b.date.localeCompare(a.date));
-        persist();
-        const archiveTab = document.getElementById('tab-archive');
-        if (archiveTab && archiveTab.style.display !== 'none') renderArchive();
-      }
-    }
-    updateSyncStatus('ok','Up to date');
-  } catch { updateSyncStatus('err','Could not load from Gist'); }
-}
-
-async function manualSync() {
-  if (!getToken()) { showSetup(); return; }
-  await syncFromGist();
-  await syncToGist();
-}
-
-init();
+refresh();
 </script>
 </body>
 </html>
