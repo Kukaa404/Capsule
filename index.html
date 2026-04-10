@@ -582,6 +582,8 @@ textarea::placeholder { color: var(--ink-3); font-style: italic; }
       </div>
       <button class="btn-sync" onclick="manualSync()">Sync now</button>
     </div>
+    <div id="debug-box" style="margin-top:10px;font-size:11px;color:var(--ink-3);background:var(--surface-2);border-radius:var(--r-sm);padding:8px 12px;display:none;word-break:break-all;line-height:1.7;"></div>
+    <button onclick="runDebug()" style="margin-top:8px;font-size:11px;color:var(--blue);background:var(--blue-pale);border:1px solid var(--blue);border-radius:var(--r-sm);padding:4px 12px;cursor:pointer;font-family:DM Sans,sans-serif;">Debug sync</button>
   </div>
 
   <!-- Capsule -->
@@ -954,6 +956,64 @@ async function manualSync() {
   if (!getToken()) { showSetup(); return; }
   await pullFromGist();
   await pushToGist();
+}
+
+async function runDebug() {
+  const box = document.getElementById('debug-box');
+  box.style.display = 'block';
+  box.innerHTML = 'Running…';
+  const lines = [];
+  const token = getToken();
+  lines.push('Token: ' + (token ? token.slice(0,8)+'…' : 'NONE'));
+  lines.push('Local entries: ' + entries.length);
+  lines.push('Stored GistId: ' + (getGistId() || 'NONE'));
+  if (token) {
+    try {
+      const r1 = await fetch('https://api.github.com/gists?per_page=100', {
+        headers: { Authorization: 'token ' + token }
+      });
+      lines.push('Gist list status: ' + r1.status);
+      if (r1.ok) {
+        const list = await r1.json();
+        lines.push('Total gists: ' + list.length);
+        const found = list.find(g => g.files && g.files['capsule-data.json']);
+        if (found) {
+          lines.push('Found capsule gist: ' + found.id);
+          localStorage.setItem(GIST_KEY, found.id);
+          const r2 = await fetch('https://api.github.com/gists/' + found.id, {
+            headers: { Authorization: 'token ' + token }
+          });
+          lines.push('Gist fetch status: ' + r2.status);
+          if (r2.ok) {
+            const gdata = await r2.json();
+            const raw = gdata.files['capsule-data.json'] && gdata.files['capsule-data.json'].content;
+            lines.push('Content length: ' + (raw ? raw.length : 0));
+            if (raw) {
+              const remote = JSON.parse(raw);
+              lines.push('Remote entries: ' + remote.length);
+              const ids = new Set(entries.map(x=>x.id));
+              let added = 0;
+              remote.forEach(x => { if (!ids.has(x.id)) { entries.push(x); added++; } });
+              lines.push('New entries added: ' + added);
+              if (added > 0) {
+                entries.sort((a,b)=>b.date.localeCompare(a.date));
+                persist();
+                updateStats();
+                renderArchive();
+                lines.push('✓ Archive updated!');
+              }
+            }
+          }
+        } else {
+          lines.push('No capsule gist found');
+          lines.push('Gist names: ' + list.slice(0,5).map(g=>Object.keys(g.files||{}).join(',')).join(' | '));
+        }
+      }
+    } catch(e) {
+      lines.push('Error: ' + e.message);
+    }
+  }
+  box.innerHTML = lines.join('<br>');
 }
 
 init();
