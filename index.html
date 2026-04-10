@@ -984,8 +984,10 @@ async function runDebug() {
         const found = list.find(g => g.files && g.files['capsule-data.json']);
         if (found) {
           lines.push('Found capsule gist: ' + found.id);
-          localStorage.setItem(GIST_KEY, found.id);
-          const r2 = await fetch('https://api.github.com/gists/' + found.id + '?_=' + Date.now(), {
+          // Use stored GistId if available, don't override with search result
+          const useId = localStorage.getItem('capsule_gist_id') || found.id;
+          lines.push('Using GistId: ' + useId);
+          const r2 = await fetch('https://api.github.com/gists/' + useId + '?_=' + Date.now(), {
             headers: { Authorization: 'token ' + token }
           });
           lines.push('Gist fetch status: ' + r2.status);
