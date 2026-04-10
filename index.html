@@ -922,7 +922,7 @@ async function pullFromGist() {
       updateSyncStatus('ok', 'No data in cloud yet');
     }
   } catch(e) {
-    updateSyncStatus('err', 'Pull failed: ' + e.message);
+    updateSyncStatus('err', 'Pull failed: ' + e.message + ' | ' + e.toString());
   }
 }
 
