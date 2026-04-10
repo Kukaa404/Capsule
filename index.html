@@ -615,11 +615,14 @@ textarea::placeholder { color: var(--ink-3); font-style: italic; }
     <div class="setup-card">
       <div class="setup-title">Connect GitHub Sync</div>
       <div class="setup-txt">
-        Paste a GitHub Personal Access Token with <strong>gist</strong> scope.<br>
-        Your data will sync as a private Gist under <strong>Kukaa404</strong>.<br>
+        Paste your GitHub Personal Access Token with <strong>gist</strong> scope.<br>
         Token is stored locally on this device only.
       </div>
       <input type="password" class="setup-input" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      <div style="margin-top:10px;">
+        <div class="setup-txt" style="margin-bottom:6px;">Gist ID <span style="color:var(--ink-3);font-size:11px;">（可选，填入后直接同步已有数据）</span></div>
+        <input type="text" class="setup-input" id="gistid-input" placeholder="留空自动创建，或粘贴已有 Gist ID">
+      </div>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="btn-save" style="font-size:11px;padding:8px 16px;letter-spacing:0.5px;" onclick="saveToken()">Connect</button>
         <button class="btn-clear" style="font-size:11px;padding:8px 14px;" onclick="document.getElementById('setup-panel').style.display='none'">Cancel</button>
@@ -853,6 +856,8 @@ function saveToken() {
   const t = document.getElementById('token-input').value.trim();
   if (!t) return;
   localStorage.setItem(TOKEN_KEY, t);
+  const gid = document.getElementById('gistid-input').value.trim();
+  if (gid) localStorage.setItem(GIST_KEY, gid);
   document.getElementById('setup-panel').style.display = 'none';
   // On connect: ONLY pull, never push
   pullFromGist();
