@@ -854,7 +854,7 @@ function saveToken() {
   localStorage.setItem(TOKEN_KEY, t);
   document.getElementById('setup-panel').style.display = 'none';
   updateSyncStatus('busy','Connecting…');
-  syncToGist();
+  syncFromGist();
 }
 
 async function syncToGist() {
@@ -883,7 +883,11 @@ async function syncToGist() {
 async function syncFromGist() {
   const token = getToken(); if (!token) return;
   const gistId = getGistId();
-  if (!gistId) { syncToGist(); return; }
+  if (!gistId) {
+    if (entries.length > 0) syncToGist();
+    else updateSyncStatus('ok','Connected — write something first');
+    return;
+  }
   updateSyncStatus('busy','Loading…');
   try {
     const res = await fetch(`https://api.github.com/gists/${gistId}`, {
@@ -897,7 +901,12 @@ async function syncFromGist() {
       const ids = new Set(entries.map(x=>x.id));
       let added = 0;
       remote.forEach(x => { if (!ids.has(x.id)) { entries.push(x); added++; } });
-      if (added) { entries.sort((a,b)=>b.date.localeCompare(a.date)); persist(); }
+      if (added) {
+        entries.sort((a,b)=>b.date.localeCompare(a.date));
+        persist();
+        const archiveTab = document.getElementById('tab-archive');
+        if (archiveTab && archiveTab.style.display !== 'none') renderArchive();
+      }
     }
     updateSyncStatus('ok','Up to date');
   } catch { updateSyncStatus('err','Could not load from Gist'); }
@@ -913,4 +922,3 @@ init();
 </script>
 </body>
 </html>
-
