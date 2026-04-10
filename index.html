@@ -856,10 +856,33 @@ function saveToken() {
   pullFromGist();
 }
 
+// Find gist by searching user's gists for capsule-data.json
+async function findGistId() {
+  const token = getToken(); if (!token) return null;
+  try {
+    const res = await fetch('https://api.github.com/gists?per_page=100', {
+      headers: { Authorization: 'token ' + token }
+    });
+    if (!res.ok) return null;
+    const list = await res.json();
+    const found = list.find(g => g.files && g.files['capsule-data.json']);
+    if (found) {
+      localStorage.setItem(GIST_KEY, found.id);
+      return found.id;
+    }
+  } catch(e) {}
+  return null;
+}
+
 // Pull remote → merge into local → save locally → refresh UI
 async function pullFromGist() {
   const token = getToken(); if (!token) return;
-  const gistId = getGistId();
+  let gistId = getGistId();
+  // If no gistId stored locally, search for it
+  if (!gistId) {
+    updateSyncStatus('busy', 'Looking for cloud data…');
+    gistId = await findGistId();
+  }
   if (!gistId) {
     updateSyncStatus('ok', 'Connected — no cloud data yet');
     return;
