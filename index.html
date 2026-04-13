@@ -702,19 +702,44 @@ function toggleEmoji(el, e) {
   if (curEmoji) el.classList.add('on');
 }
 
-function handleImage(ev) {
+const CLOUDINARY_CLOUD = 'd.somnambulist';
+const CLOUDINARY_PRESET = 'capsule_upload';
+
+async function handleImage(ev) {
   const f = ev.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = e => { curImg = e.target.result; renderImgPreview(); };
-  r.readAsDataURL(f);
   ev.target.value = '';
+  // Show uploading state
+  document.getElementById('img-add-btn').style.display = 'none';
+  document.getElementById('img-preview').innerHTML = '<div style="font-size:12px;color:var(--ink-3);padding:10px 0;">Uploading…</div>';
+  try {
+    const url = await uploadToCloudinary(f);
+    curImg = url;
+    renderImgPreview();
+  } catch(e) {
+    document.getElementById('img-add-btn').style.display = 'inline-flex';
+    document.getElementById('img-preview').innerHTML = '<div style="font-size:12px;color:#b03a2e;padding:6px 0;">Upload failed — ' + e.message + '</div>';
+  }
+}
+
+async function uploadToCloudinary(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+  const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', {
+    method: 'POST',
+    body: formData
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.secure_url;
 }
 function renderImgPreview() {
   const btn = document.getElementById('img-add-btn');
   const prev = document.getElementById('img-preview');
   if (curImg) {
     btn.style.display = 'none';
-    prev.innerHTML = `<div class="img-wrap"><img class="img-full" src="${curImg}"><button class="img-del" onclick="removeImg()">✕</button></div>`;
+    prev.innerHTML = '<div class="img-wrap"><img class="img-full" src="' + curImg + '"><button class="img-del" onclick="removeImg()">✕</button></div>';
   } else {
     btn.style.display = 'inline-flex';
     prev.innerHTML = '';
