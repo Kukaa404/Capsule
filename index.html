@@ -747,9 +747,15 @@ function renderImgPreview() {
 }
 function removeImg() { curImg = null; renderImgPreview(); }
 
+let isSaving = false;
 function saveEntry() {
+  if (isSaving) return;
   const txt = document.getElementById('entry-text').value.trim();
   if (!txt) return;
+  isSaving = true;
+  const btn = document.querySelector('.btn-save');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
   const dateVal = document.getElementById('date-picker').value;
   const now = new Date();
   entries.push({
@@ -763,10 +769,9 @@ function saveEntry() {
   entries.sort((a,b) => b.date.localeCompare(a.date) || b.id-a.id);
   persist();
   if (getToken()) syncToGist();
-  const t = document.getElementById('save-toast');
-  t.classList.add('on');
-  setTimeout(() => t.classList.remove('on'), 2200);
+  showToast('save-toast', 'Entry saved ✦');
   clearForm();
+  setTimeout(() => { isSaving = false; btn.disabled = false; btn.textContent = 'Save'; }, 1500);
 }
 
 function clearForm() {
@@ -832,8 +837,9 @@ function delEntry(id) {
   if (!confirm('Delete this entry?')) return;
   entries = entries.filter(e=>e.id!==id);
   persist();
-  if (getToken()) syncToGist();
   renderArchive();
+  showToast('save-toast', 'Deleted ✦');
+  if (getToken()) syncToGist();
 }
 
 function exportJSON() {
@@ -986,6 +992,14 @@ async function manualSync() {
   if (!getToken()) { showSetup(); return; }
   await pullFromGist();
   await pushToGist();
+}
+
+function showToast(id, msg) {
+  const t = document.getElementById(id);
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2200);
 }
 
 async function runDebug() {
