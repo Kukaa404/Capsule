@@ -650,6 +650,7 @@ textarea::placeholder { color: var(--ink-3); font-style: italic; }
 const LKEY = 'capsule_v3';
 const GIST_KEY = 'capsule_gist_id';
 const TOKEN_KEY = 'capsule_gh_token';
+const HARDCODED_GIST_ID = '29df2f446b3d29a5c6f986e5e213ee12';
 
 let entries = [];
 let curEmoji = '';
@@ -662,7 +663,7 @@ function persist() {
   try { localStorage.setItem(LKEY, JSON.stringify(entries)); } catch {}
 }
 function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
-function getGistId() { return localStorage.getItem(GIST_KEY) || ''; }
+function getGistId() { return localStorage.getItem(GIST_KEY) || HARDCODED_GIST_ID; }
 
 function init() {
   load();
@@ -768,10 +769,12 @@ function saveEntry() {
   });
   entries.sort((a,b) => b.date.localeCompare(a.date) || b.id-a.id);
   persist();
-  if (getToken()) syncToGist();
   showToast('save-toast', 'Entry saved ✦');
   clearForm();
-  setTimeout(() => { isSaving = false; btn.disabled = false; btn.textContent = 'Save'; }, 1500);
+  isSaving = false;
+  btn.disabled = false;
+  btn.textContent = 'Save';
+  if (getToken()) safePushToGist();
 }
 
 function clearForm() {
@@ -839,7 +842,7 @@ function delEntry(id) {
   persist();
   renderArchive();
   showToast('save-toast', 'Deleted ✦');
-  if (getToken()) syncToGist();
+  if (getToken()) safePushToGist();
 }
 
 function exportJSON() {
@@ -887,8 +890,7 @@ function saveToken() {
   const t = document.getElementById('token-input').value.trim();
   if (!t) return;
   localStorage.setItem(TOKEN_KEY, t);
-  const gid = document.getElementById('gistid-input').value.trim();
-  if (gid) localStorage.setItem(GIST_KEY, gid);
+  localStorage.setItem(GIST_KEY, HARDCODED_GIST_ID);
   document.getElementById('setup-panel').style.display = 'none';
   // On connect: ONLY pull, never push
   pullFromGist();
@@ -1000,6 +1002,36 @@ function showToast(id, msg) {
   t.textContent = msg;
   t.classList.add('on');
   setTimeout(() => t.classList.remove('on'), 2200);
+}
+
+// Safe push: always pull remote first, merge, then push
+async function safePushToGist() {
+  const token = getToken(); if (!token) return;
+  const gistId = getGistId(); if (!gistId) { pushToGist(); return; }
+  try {
+    const res = await fetch('https://api.github.com/gists/' + gistId + '?_=' + Date.now(), {
+      headers: { Authorization: 'token ' + token, 'Cache-Control': 'no-cache' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const raw = data.files && data.files['capsule-data.json'] && data.files['capsule-data.json'].content;
+      if (raw) {
+        const remote = JSON.parse(raw);
+        if (Array.isArray(remote) && remote.length > 0) {
+          const ids = new Set(entries.map(x => x.id));
+          let added = 0;
+          remote.forEach(x => { if (!ids.has(x.id)) { entries.push(x); added++; } });
+          if (added > 0) {
+            entries.sort((a,b) => b.date.localeCompare(a.date));
+            persist();
+            updateStats();
+            renderArchive();
+          }
+        }
+      }
+    }
+  } catch(e) {}
+  pushToGist();
 }
 
 async function runDebug() {
