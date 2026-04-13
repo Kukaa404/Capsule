@@ -901,7 +901,7 @@ async function findGistId() {
   const token = getToken(); if (!token) return null;
   try {
     const res = await fetch('https://api.github.com/gists?per_page=100&_=' + Date.now(), {
-      headers: { Authorization: 'token ' + token, 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      headers: { Authorization: 'token ' + token }
     });
     if (!res.ok) return null;
     const list = await res.json();
@@ -930,7 +930,7 @@ async function pullFromGist() {
   updateSyncStatus('busy', 'Pulling…');
   try {
     const res = await fetch('https://api.github.com/gists/' + gistId + '?_=' + Date.now(), {
-      headers: { Authorization: 'token ' + token, 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      headers: { Authorization: 'token ' + token }
     });
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
@@ -1010,7 +1010,7 @@ async function safePushToGist() {
   const gistId = getGistId(); if (!gistId) { pushToGist(); return; }
   try {
     const res = await fetch('https://api.github.com/gists/' + gistId + '?_=' + Date.now(), {
-      headers: { Authorization: 'token ' + token, 'Cache-Control': 'no-cache' }
+      headers: { Authorization: 'token ' + token }
     });
     if (res.ok) {
       const data = await res.json();
